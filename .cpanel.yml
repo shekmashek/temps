@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/formatio/temps.mg/
-    - /bin/cp index_accueil.blade.php $DEPLOYPATH
+    - /bin/cp -R * $DEPLOYPATH
