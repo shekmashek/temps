@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/formatio/temps.mg/
+    - /bin/cp -R * $DEPLOYPATH
