@@ -39,7 +39,7 @@
                                 data-bs-toggle="dropdown" aria-expanded="false">Fonctionnalités</a>
                             <ul class="dropdown-menu p-3" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item pt-2" href="#" rel="noopener noreferrer"><i
-                                            class="far fa-mouse-pointer center icon_back"></i> &nbsp; Pointeuse digitale </a></li>
+                                            class="far fa-mouse-pointer center icon_back"></i> &nbsp; Pointeuse en ligne </a></li>
                                 <li><a class="dropdown-item pt-2" href="#" rel="noopener noreferrer"><i
                                             class="fad fa-clipboard icon_back6"></i> &nbsp; Horaires de travails</a></li>
                                 <li><a class="dropdown-item pt-2" href="#" rel="noopener noreferrer"><i
@@ -88,7 +88,7 @@
                 <div class="row h-100">
                     <div class="container p-0 g-0">
                         <div class="col-6 section1_text g-0 m-0">
-                            <h1>Plateforme de gestion de salaire en ligne</h1>
+                            <h1>Plateforme de gestion de temps en ligne</h1>
                             <p class="pt-5 pe-5">La première plateforme malagasy de gestion de temps, un outil
                                 incontournable et innovateur du milieu professionnel. <br> Découvrez les horizons
                                 de notre logiciel et en quoi il vous est indispensable.
