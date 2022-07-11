@@ -37,3 +37,4 @@ Route::get('/tarifs', function () {
 });
 
 Route::get('condition_generale_de_vente', 'ConditionController@index')->name('condition_generale_de_vente');
+//test
