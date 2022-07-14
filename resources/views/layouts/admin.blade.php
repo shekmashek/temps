@@ -53,7 +53,7 @@
         <ul class="nav nav_list mb-5" id="menu">
             {{-- @canany(['isSuperAdmin','isAdmin']) --}}
             <li>
-                <a href="{{route('listeAbonne')}}" class="d-flex abonnees nav_linke">
+                <a href="#" class="d-flex abonnees nav_linke">
                     <i class='bx bxl-sketch'></i>
                     <span class="links_name">Abonnées</span>
                 </a>

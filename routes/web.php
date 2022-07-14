@@ -24,7 +24,6 @@ Route::get('contact', function () {
 Route::get('contacts', function () {
     return view('contacts');
 });
-
 Route::get('/politique_confidentialite', function () {
     return view('/politique_confidentialite');
 })->name('politique_confidentialite');
@@ -35,5 +34,12 @@ Route::get('/politique_confidentialites', function () {
 Route::get('/tarifs', function () {
     return view('/tarif');
 });
-
 Route::get('condition_generale_de_vente', 'ConditionController@index')->name('condition_generale_de_vente');
+
+
+// accueil affiche direct le clockpicker/pointage
+Route::get('/home', function () {
+    return view('pointage.pointage');
+});
+// validation pointage
+// Route::get('valider', 'HomeController@index')->name('home');
