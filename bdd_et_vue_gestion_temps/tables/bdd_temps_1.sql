@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+-- Active: 1657795847622@@127.0.0.1@3306@bdd_temps
+=======
 -- Active: 1656400043423@@127.0.0.1@3306@bdd_nicole
+>>>>>>> 2562bcf6d846adb2e0a85e6d63ad061f0f3c41c1
 CREATE TABLE temps_roles (
     id bigint(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     role_name varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -54,7 +58,7 @@ CREATE TABLE temps_employers (
     matricule varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     nom varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     prenom varchar(255) COLLATE utf8mb4_unicode_ci,
-    date_naissance date DEFAULT current_timestamp(),
+    date_naissance DATETIME DEFAULT current_timestamp(),
     cin varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     email varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     telephone varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
