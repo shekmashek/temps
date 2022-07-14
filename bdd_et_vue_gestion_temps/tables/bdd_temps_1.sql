@@ -1,3 +1,4 @@
+-- Active: 1656400043423@@127.0.0.1@3306@bdd_nicole
 CREATE TABLE temps_roles (
     id bigint(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     role_name varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -86,13 +87,13 @@ CREATE TABLE `temps_chef_dep_entreprises` (
     `updated_at` timestamp default current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create Table pointage
-(
-time entree,
-time pause,
-time rentree,
-time sortie,
-datetime ajd,
-BIGINT id_employer
+create Table temps_pointage(
+    id bigint(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    entree time DEFAULT CURRENT_TIME() NOT NULL,
+    debut_pause time,
+    fin_pause time,
+    sortie time,
+    jour datetime DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    employer_id bigint(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    foreign key(employer_id) references temps_employers(id) on delete cascade,
 );
-
