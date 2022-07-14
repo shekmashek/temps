@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 class PointageController extends Controller
 {
     //
-    public function entre(Request $request){
-        DB::insert('insert into temps_pointage values employer_id(1)');
+    public function entrer(Request $request){
+        DB::insert('insert into temps_pointage (employer_id) values (1)');
         return redirect()->back();
     }
 }

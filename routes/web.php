@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ConditionController;
+use App\Http\Controllers\PointageController;
+use App\Http\Controllers\HomeController;
 
 
 Route::get('/', function () {
@@ -34,12 +37,11 @@ Route::get('/politique_confidentialites', function () {
 Route::get('/tarifs', function () {
     return view('/tarif');
 });
-Route::get('condition_generale_de_vente', 'ConditionController@index')->name('condition_generale_de_vente');
+Route::get('condition_generale_de_vente', [ConditionController::class,'index'])->name('condition_generale_de_vente');
 
 
 // accueil affiche direct le clockpicker/pointage
-Route::get('/home', function () {
-    return view('pointage.pointage');
-});
+Route::get('home', [HomeController::class,'index'])->name('home');
+
 // validation pointage
-Route::get('valider_entrer', 'PointageController@entre')->name('valider_entrer');
+Route::get('valider_entrer', [PointageController::class,'entrer'])->name('valider_entrer');
