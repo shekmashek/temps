@@ -42,4 +42,4 @@ Route::get('/home', function () {
     return view('pointage.pointage');
 });
 // validation pointage
-// Route::get('valider', 'HomeController@index')->name('home');
+Route::get('valider_entrer', 'PointageController@entre')->name('valider_entrer');

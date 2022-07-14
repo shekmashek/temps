@@ -94,6 +94,6 @@ create Table temps_pointage(
     fin_pause time,
     sortie time,
     jour datetime DEFAULT CURRENT_TIMESTAMP() NOT NULL,
-    employer_id bigint(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    foreign key(employer_id) references temps_employers(id) on delete cascade,
+    employer_id bigint(20) UNSIGNED NOT NULL,
+    foreign key(employer_id) references temps_employers(id) on delete cascade
 );
