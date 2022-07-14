@@ -4,13 +4,7 @@
 </p>
 @endsection
 @section('content')
-    <div class="input-group clockpicker">
-        <input type="text" class="form-control" value="09:30">
-        <span class="input-group-addon">
-        <span class="glyphicon glyphicon-time"></span>
-        </span>
-    </div>
-<script type="text/javascript">
-    $('.clockpicker').clockpicker();
-</script>
+    <form action={{route('valider_entrer')}} >
+        <button type="submit" class="btn btn-info">i'm here</button>
+    </form>
 @endsection
