@@ -5,6 +5,7 @@
 @endsection
 @section('content')
     <form action={{route('valider_entrer')}} >
+        @csrf
         <button type="submit" class="btn btn-info">i'm here</button>
     </form>
 @endsection
