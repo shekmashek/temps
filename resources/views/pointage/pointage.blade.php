@@ -22,25 +22,36 @@
             <input type="submit" class="btn btn-outline-success btn-lg" value="Entrée">
         </form>
     </div>
+    @elseif($boutton == 'oublie_entree')
+    <div style="display: inline-block">
+        <form action={{route('modifier_entrer')}} >
+            @csrf
+            <input type="time" name="modif_entree">
+            <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
+            <input type="submit" value="Valider">
+        </form>
+    </div>
     @elseif($boutton == 'sortie')
     <div style="display: inline-block">
         <form action={{route('valider_sortie')}} >
             @csrf
-            <input type="submit" class="btn btn-outline-danger btn-lg" value="Sortie">
+            <input type="submit" class="btn btn-outline-primary btn-lg" value="Sortie">
         </form>
     </div>
-    <br>
+    @elseif($boutton == 'oublie_sortie')
+    <div style="display: inline-block">
+        <form action={{route('modifier_sortie')}} >
+            @csrf
+            <input type="time" name="modif_sortie">
+            <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
+            <input type="submit" value="Valider">
+        </form>
+    </div>
     @elseif($boutton == 'terminé')
     <div class="alert alert-warning" role="alert">
         <h5 class="alert-heading">Vous avez terminé tous vos pointage pour aujourd'hui.</h5>
         <p>On vous revoit demain !</p>
     </div>
-    @elseif($boutton == 'oublie_sortie')
-    <div class="alert alert-warning" role="alert">
-        <h5 class="alert-heading">adino omaly</h5>
-        <p>On vous revoit demain !</p>
-    </div>
     @endif
-
 </div>
 @endsection

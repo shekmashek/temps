@@ -40,16 +40,19 @@ class PointageController extends Controller
                 $pointage_id = $valeur_pointage_hier[0]->id;
                 return view('pointage.pointage',compact('boutton','pointage_id'));
             }
+            elseif(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie)){
+                // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
+                if($valeur_pointage->isEmpty()) {
+                    DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+                    return redirect()->back();
+                }
+                // raha efa nisy pointage androany
+                elseif($valeur_pointage->isNotEmpty())
+                    if($valeur_pointage[0]->entree)
+                        return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
+            }
         }
-        // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
-        elseif($valeur_pointage->isEmpty()) {
-            DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
-            return redirect()->back();
-        }
-        // raha efa nisy pointage androany
-        elseif($valeur_pointage->isNotEmpty())
-            if($valeur_pointage[0]->entree)
-                return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
+
     }
 
     public function sortie(Request $request){
@@ -82,33 +85,16 @@ class PointageController extends Controller
     }
 
     public function update_entrer(Request $request){
-        $valeur_pointage = $this->valeur_pointage_maintenant();
-        if($valeur_pointage->isEmpty()) {
-            DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
-            return redirect()->back();
-        }
-        elseif($valeur_pointage->isNotEmpty())
-            if($valeur_pointage[0]->entree)
-                return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
-        elseif($valeur_pointage->isEmpty()){
-            $boutton = 'oublie_sortie';
-            return view('pointage.pointage',compact('boutton'));
-        }
+        DB::table('temps_pointage')
+            ->where('id', $request->pointage_id)
+            ->update(['entree' => $request->modif_entree]);
+        return redirect()->back();
     }
 
     public function update_sortie(Request $request){
-        $valeur_pointage = $this->valeur_pointage_maintenant();
-        if($valeur_pointage->isNotEmpty()){
-            if($valeur_pointage[0]->sortie == null){
-                DB::table('temps_pointage')
-                    ->where('id', $valeur_pointage[0]->id)
-                    ->update(['sortie' => $this->heure_actuel]);
-                return redirect()->back();
-            }
-            elseif($valeur_pointage[0]->sortie) return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->sortie);
-        }elseif($valeur_pointage->isEmpty()){
-            $boutton = 'oublie_entree';
-            return view('pointage.pointage',compact('boutton'));
-        }
+        DB::table('temps_pointage')
+            ->where('id', $request->pointage_id)
+            ->update(['sortie' => $request->modif_sortie]);
+        return redirect()->back();
     }
 }

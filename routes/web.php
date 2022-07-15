@@ -47,4 +47,9 @@ Route::get('home', [HomeController::class,'index'])->name('home');
 Route::get('valider_entrer', [PointageController::class,'entrer'])->name('valider_entrer');
 Route::get('valider_sortie', [PointageController::class,'sortie'])->name('valider_sortie');
 
+// modification pointage
+Route::get('modifier_entrer', [PointageController::class,'update_entrer'])->name('modifier_entrer');
+Route::get('modifier_sortie', [PointageController::class,'update_sortie'])->name('modifier_sortie');
+
+
 
