@@ -14,7 +14,7 @@
     </div>
     @elseif($boutton == 'sortie')
     <div style="display: inline-block">
-        <form action={{route('valider_entrer')}} >
+        <form action={{route('valider_sortie')}} >
             @csrf
             <input type="submit" class="btn btn-outline-danger btn-lg" value="Sortie">
         </form>

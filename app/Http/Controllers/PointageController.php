@@ -32,10 +32,11 @@ class PointageController extends Controller
 
     public function sortie(Request $request){
         $valeur_pointage = $this->valeur_pointage();
+            // dd($valeur_pointage);
         if($valeur_pointage->isNotEmpty()){
             if($valeur_pointage[0]->sortie == null){
                 DB::table('temps_pointage')
-                    ->where('id', $valeur_pointage->id)
+                    ->where('id', $valeur_pointage[0]->id)
                     ->update(['sortie' => $this->heure_actuel]);
             }
             elseif($valeur_pointage[0]->sortie) return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->sortie);

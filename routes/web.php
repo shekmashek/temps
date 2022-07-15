@@ -45,5 +45,6 @@ Route::get('home', [HomeController::class,'index'])->name('home');
 
 // validation pointage
 Route::get('valider_entrer', [PointageController::class,'entrer'])->name('valider_entrer');
+Route::get('valider_sortie', [PointageController::class,'sortie'])->name('valider_sortie');
 
 
