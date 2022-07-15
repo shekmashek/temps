@@ -20,21 +20,18 @@ class HomeController extends Controller
             ->whereDate('jour', now())
             ->get(['entree','sortie']);
             // dd($pointage);
-        if($pointage->isEmpty()){
-            // raha tsy mbola misy pointage dia miditra anaty accueil avec boutton entrer
-            $boutton = 'entrer';
-            return view('pointage.pointage',compact('boutton'));
-        }elseif($pointage->isNotEmpty()){
-            // raha efa misy pointage fa mbola tsisy sortie
-            if($pointage[0]->sortie==null) {
-                $boutton = 'sortie';
-                return view('pointage.pointage',compact('boutton'));
-            }
+
+        // raha tsy mbola misy pointage dia miditra anaty accueil avec boutton entrer
+        if($pointage->isEmpty())$boutton = 'entrée';
+
+        // raha efa misy pointage
+        elseif($pointage->isNotEmpty()){
+            // fa mbola tsisy sortie
+            if($pointage[0]->sortie==null)$boutton = 'sortie';
+
             // raha efa misy sortie
-            elseif($pointage[0]->sortie){
-                $msg = 'Vous avez deja fait tous les pointages pour aujourd hui. À demain!';
-                return view('pointage.pointage',compact('msg'));
-            }
+            elseif($pointage[0]->sortie)$boutton = 'terminé';
         }
+        return view('pointage.pointage',compact('boutton'));
     }
 }
