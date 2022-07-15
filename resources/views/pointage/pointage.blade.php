@@ -26,14 +26,14 @@
     <div style="display: inline-block">
         <form action={{route('modifier_entrer')}} >
             @csrf
-            <input type="time" name="modif_entree">
+            <input type="time" name="modif_entree" class="form-control">
             <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
             <input type="submit" value="Valider">
         </form>
     </div>
     @elseif($boutton == 'sortie')
     <div style="display: inline-block">
-        <form action={{route('valider_sortie')}} >
+        <form action={{route('valider_sortie')}}>
             @csrf
             <input type="submit" class="btn btn-outline-primary btn-lg" value="Sortie">
         </form>
@@ -42,7 +42,7 @@
     <div style="display: inline-block">
         <form action={{route('modifier_sortie')}} >
             @csrf
-            <input type="time" name="modif_sortie">
+            <input type="time" name="modif_sortie" class="form-control">
             <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
             <input type="submit" value="Valider">
         </form>
