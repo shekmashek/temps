@@ -37,7 +37,7 @@
     </div>
     @elseif($boutton == 'oublie_sortie')
     <div class="alert alert-warning" role="alert">
-        <h5 class="alert-heading">avez terminé tous vos pointage pour aujourd'hui.</h5>
+        <h5 class="alert-heading">adino omaly</h5>
         <p>On vous revoit demain !</p>
     </div>
     @endif

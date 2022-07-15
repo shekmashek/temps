@@ -34,10 +34,12 @@ class PointageController extends Controller
         $valeur_pointage = $this->valeur_pointage_maintenant();
         $valeur_pointage_hier = $this->valeur_pointage_hier();
         // rehefa vao tonga izy dia mijery hoe nisy pointage sortie adino ve omaly
-        if($valeur_pointage_hier->isNotEmpty() or ($valeur_pointage_hier[0]->entree == null and $valeur_pointage_hier[0]->sortie == null)){
-            $boutton = 'oublie_sortie';
-            $pointage_id = $valeur_pointage_hier[0]->id;
-            return view('pointage.pointage',compact('boutton','pointage_id'));
+        if($valeur_pointage_hier->isNotEmpty()){
+            if(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie == null)){
+                $boutton = 'oublie_sortie';
+                $pointage_id = $valeur_pointage_hier[0]->id;
+                return view('pointage.pointage',compact('boutton','pointage_id'));
+            }
         }
         // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
         elseif($valeur_pointage->isEmpty()) {
