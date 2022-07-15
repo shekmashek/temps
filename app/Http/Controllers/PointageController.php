@@ -26,7 +26,7 @@ class PointageController extends Controller
         $pointage = DB::table('temps_pointage')
             ->where('employer_id', $this->user_id)
             ->whereDate('jour', Carbon::yesterday())
-            ->get(['entree','sortie','id']);
+            ->get(['entree','sortie','id','heure_pause']);
         return $pointage;
     }
 
@@ -37,10 +37,13 @@ class PointageController extends Controller
         if($valeur_pointage_hier->isNotEmpty()){
             if(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie == null)){
                 // sady mampiditra entrée no manao redirect modification sortie omaly
-                DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+                if($valeur_pointage->isEmpty()) {
+                    DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+                }
                 $boutton = 'oublie_sortie';
                 $pointage_id = $valeur_pointage_hier[0]->id;
-                return view('pointage.pointage',compact('boutton','pointage_id'));
+                $pause_hier = $valeur_pointage_hier[0]->heure_pause;
+                return view('pointage.pointage',compact('boutton','pointage_id','pause_hier'));
             }
             elseif(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie)){
                 // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
@@ -84,7 +87,7 @@ class PointageController extends Controller
             if($valeur_pointage[0]->sortie == null){
                 DB::table('temps_pointage')
                     ->where('id', $valeur_pointage[0]->id)
-                    ->update(['sortie' => $this->heure_actuel]);
+                    ->update(['sortie' => $this->heure_actuel, 'heure_pause' => $request->heure_pause]);
                 return redirect()->back();
             }
             // raha efa nanao pointage sortie
@@ -108,7 +111,7 @@ class PointageController extends Controller
     public function update_sortie(Request $request){
         DB::table('temps_pointage')
             ->where('id', $request->pointage_id)
-            ->update(['sortie' => $request->modif_sortie]);
+            ->update(['sortie' => $request->modif_sortie, 'heure_pause' => $request->modif_pause]);
         return redirect('/home');
     }
 }

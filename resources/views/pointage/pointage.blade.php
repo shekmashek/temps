@@ -36,7 +36,7 @@
     <div style="display: inline-block">
         <form action={{route('valider_sortie')}}>
             @csrf
-            <input type="number" class="form-control" name="pause" placeholder="Durée pause">
+            <input type="number" step="0.1" class="form-control" name="heure_pause" placeholder="Durée pause">
             <br>
             <input type="submit" class="btn btn-outline-primary btn-lg" value="Sortie">
         </form>
@@ -46,7 +46,7 @@
         <form action={{route('modifier_sortie')}} >
             @csrf
             <label for="modif_sortie">Modifier la sortie</label>
-            <input type="number" class="form-control" name="pause" placeholder="Durée pause">
+            <input type="number" step="0.1" class="form-control" name="heure_pause" value="{{ $pause_hier }}">
             <br>
             <input type="time" name="modif_sortie" class="form-control">
             <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
