@@ -18,16 +18,23 @@ class HomeController extends Controller
         $pointage = DB::table('temps_pointage')
             ->where('employer_id', $user_id)
             ->whereDate('jour', now())
-            ->get();
-        if($pointage->isNotEmpty()){
+            ->get(['entree','sortie']);
+            // dd($pointage);
+        if($pointage->isEmpty()){
+            // raha tsy mbola misy pointage dia miditra anaty accueil avec boutton entrer
+            $boutton = 'entrer';
+            return view('pointage.pointage',compact('boutton'));
+        }elseif($pointage->isNotEmpty()){
+            // raha efa misy pointage fa mbola tsisy sortie
             if($pointage[0]->sortie==null) {
                 $boutton = 'sortie';
                 return view('pointage.pointage',compact('boutton'));
             }
-            elseif($pointage[0]->sortie) return redirect()->back()->with('error','vous avez deja fait un pointage pour aujourdhui');
-        }elseif($pointage[0]->isEmpty()){
-            $boutton = 'entrer';
-            return view('pointage.pointage',compact('boutton'));
+            // raha efa misy sortie
+            elseif($pointage[0]->sortie){
+                $msg = 'Vous avez deja fait tous les pointages pour aujourd hui. À demain!';
+                return view('pointage.pointage',compact('msg'));
+            }
         }
     }
 }
