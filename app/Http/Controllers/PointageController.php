@@ -9,7 +9,21 @@ class PointageController extends Controller
 {
     //
     public function entrer(Request $request){
-        DB::insert('insert into temps_pointage (employer_id) values (1)');
+        $user_id = 1;
+        $heure_actuel = date('H:i:s', time());
+        DB::insert('insert into temps_pointage (employer_id, entree) values ('.$user_id.','.$heure_actuel.')');
+        return redirect()->back();
+    }
+
+    public function sortie(Request $request){
+        $user_id = 1;
+        $pointage = DB::table('temps_pointage')
+            ->where('employer_id', $user_id)
+            ->whereDate('jour', now())
+            ->get();
+        if($pointage);
+        $heure_actuel = date('H:i:s', time());
+        DB::insert('insert into temps_pointage (employer_id, entree) values ('.$user_id.','.$heure_actuel.')');
         return redirect()->back();
     }
 }
