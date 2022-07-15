@@ -74,7 +74,8 @@ class PointageController extends Controller
 
     public function sortie(Request $request){
         $valeur_pointage = $this->valeur_pointage_maintenant();
-
+        if($request->heure_pause==null)return redirect()->back()->with('error',"Vous devez ajouter votre heure de pause.");
+        if($request->heure_pause<0)return redirect()->back()->with('error',"Votre heure de pause doit etre superieur à 0.");
         // raha efa nanao pointage entréeizy androany
         if($valeur_pointage->isNotEmpty()){
             // nefa mbola tsy nanao pointage entrée
@@ -109,6 +110,8 @@ class PointageController extends Controller
     }
 
     public function update_sortie(Request $request){
+        if($request->heure_pause==null)return redirect()->back()->with('error',"Vous devez ajouter votre heure de pause.");
+        if($request->heure_pause<0)return redirect()->back()->with('error',"Votre heure de pause doit etre superieur à 0.");
         DB::table('temps_pointage')
             ->where('id', $request->pointage_id)
             ->update(['sortie' => $request->modif_sortie, 'heure_pause' => $request->modif_pause]);
