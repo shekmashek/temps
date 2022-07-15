@@ -30,6 +30,19 @@ class PointageController extends Controller
         return $pointage;
     }
 
+    public function inserer_entree($valeur_pointage){
+
+        // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
+        if($valeur_pointage->isEmpty()) {
+            DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+            return redirect()->back();
+        }
+        // raha efa nisy pointage androany
+        elseif($valeur_pointage->isNotEmpty())
+            if($valeur_pointage[0]->entree)
+                return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
+    }
+
     public function entrer(Request $request){
         $valeur_pointage = $this->valeur_pointage_maintenant();
         $valeur_pointage_hier = $this->valeur_pointage_hier();
@@ -40,18 +53,9 @@ class PointageController extends Controller
                 $pointage_id = $valeur_pointage_hier[0]->id;
                 return view('pointage.pointage',compact('boutton','pointage_id'));
             }
-            elseif(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie)){
-                // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
-                if($valeur_pointage->isEmpty()) {
-                    DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
-                    return redirect()->back();
-                }
-                // raha efa nisy pointage androany
-                elseif($valeur_pointage->isNotEmpty())
-                    if($valeur_pointage[0]->entree)
-                        return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
-            }
+            elseif(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie)) $this->inserer_entree(($valeur_pointage));
         }
+        elseif($valeur_pointage_hier->isNotEmpty())$this->inserer_entree(($valeur_pointage));
 
     }
 
