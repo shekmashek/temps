@@ -50,12 +50,21 @@
         <h5 class="alert-heading">Vous avez terminé tous vos pointage pour aujourd'hui.</h5>
         <p>On vous revoit demain !</p>
     </div>
+    @elseif($boutton == 'oublie_sortie')
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">avez terminé tous vos pointage pour aujourd'hui.</h5>
+        <p>On vous revoit demain !</p>
+    </div>
     @endif
+<<<<<<< HEAD
     <div>
         <form action={{route('valider_entrer')}} >
             @csrf
             <input type="hidden" name="pointage_id" value="{{$pointage_id}}">
         </form>
     </div>
+=======
+
+>>>>>>> 6b94355de8ecccf1b4dc87b809bd7106dc9f4533
 </div>
 @endsection
