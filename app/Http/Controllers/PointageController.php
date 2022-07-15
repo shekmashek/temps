@@ -102,7 +102,7 @@ class PointageController extends Controller
         DB::table('temps_pointage')
             ->where('id', $request->pointage_id)
             ->update(['entree' => $request->modif_entree]);
-        return redirect()->back();
+        return redirect('/home');
     }
 
     public function update_sortie(Request $request){

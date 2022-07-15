@@ -26,6 +26,7 @@
     <div style="display: inline-block">
         <form action={{route('modifier_entrer')}} >
             @csrf
+            <label for="modif_sortie">Modifier la sortie</label>
             <input type="time" name="modif_entree" class="form-control">
             <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
             <input type="submit" value="Valider">
@@ -35,6 +36,8 @@
     <div style="display: inline-block">
         <form action={{route('valider_sortie')}}>
             @csrf
+            <input type="number" class="form-control" name="pause" placeholder="Durée pause">
+            <br>
             <input type="submit" class="btn btn-outline-primary btn-lg" value="Sortie">
         </form>
     </div>
@@ -42,6 +45,9 @@
     <div style="display: inline-block">
         <form action={{route('modifier_sortie')}} >
             @csrf
+            <label for="modif_sortie">Modifier la sortie</label>
+            <input type="number" class="form-control" name="pause" placeholder="Durée pause">
+            <br>
             <input type="time" name="modif_sortie" class="form-control">
             <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
             <input type="submit" value="Valider">
