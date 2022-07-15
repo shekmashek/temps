@@ -24,10 +24,11 @@
     </div>
     @elseif($boutton == 'oublie_entree')
     <div style="display: inline-block">
-        <form action={{route('valider_entrer')}} >
+        <form action={{route('modifier_entrer')}} >
             @csrf
-            <input type="time" class="form-control" name="modif_entree">
-            <input type="submit" value="Validez">
+            <input type="time" name="modif_entree">
+            <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
+            <input type="submit" value="Valider">
         </form>
     </div>
     @elseif($boutton == 'sortie')
@@ -39,10 +40,11 @@
     </div>
     @elseif($boutton == 'oublie_sortie')
     <div style="display: inline-block">
-        <form action={{route('valider_entrer')}} >
+        <form action={{route('modifier_sortie')}} >
             @csrf
-            <input type="time" class="form-control" name="modif_sortie">
-            <input type="submit" value="Validez">
+            <input type="time" name="modif_sortie">
+            <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
+            <input type="submit" value="Valider">
         </form>
     </div>
     @elseif($boutton == 'terminé')
@@ -56,11 +58,5 @@
         <p>Veuillez refaire votre pointage  !</p>
     </div>
     @endif
-    <div>
-        <form>
-            @csrf
-            <input type="hidden" name="pointage_id" >
-        </form>
-    </div>
 </div>
 @endsection
