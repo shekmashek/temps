@@ -100,4 +100,4 @@ create Table temps_pointage(
     jour datetime DEFAULT CURRENT_TIMESTAMP() NOT NULL,
     employer_id bigint(20) UNSIGNED NOT NULL,
     foreign key(employer_id) references temps_employers(id) on delete cascade
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

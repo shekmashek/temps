@@ -4,8 +4,18 @@
 </p>
 @endsection
 @section('content')
-    <form action="{{route('valider_entrer')}}" method="GET">
-    @csrf
-    <input type="submit" class="btn btn-primary">
-    </form>
+<div align="center">
+    <div style="display: inline-block">
+        <form action={{route('valider_entrer')}} >
+            @csrf
+            <input type="submit" class="btn btn-success" value="Arriver">
+        </form>
+    </div>
+    <div style="display: inline-block">
+        <form action={{route('valider_entrer')}} >
+            @csrf
+            <input type="submit" class="btn btn-danger" value="Sortie">
+        </form>
+    </div>
+</div>
 @endsection
