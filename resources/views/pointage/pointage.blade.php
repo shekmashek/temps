@@ -35,6 +35,12 @@
         <h5 class="alert-heading">Vous avez terminé tous vos pointage pour aujourd'hui.</h5>
         <p>On vous revoit demain !</p>
     </div>
+    @elseif($boutton == 'oublie_sortie')
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">avez terminé tous vos pointage pour aujourd'hui.</h5>
+        <p>On vous revoit demain !</p>
+    </div>
     @endif
+
 </div>
 @endsection
