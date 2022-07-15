@@ -26,7 +26,7 @@
     <div style="display: inline-block">
         <form action={{route('valider_entrer')}} >
             @csrf
-            <input type="time" name="modif_entree">
+            <input type="time" class="form-control" name="modif_entree">
             <input type="submit" value="Validez">
         </form>
     </div>
@@ -41,15 +41,26 @@
     <div style="display: inline-block">
         <form action={{route('valider_entrer')}} >
             @csrf
-            <input type="time" name="modif_sortie">
+            <input type="time" class="form-control" name="modif_sortie">
             <input type="submit" value="Validez">
         </form>
     </div>
     @elseif($boutton == 'terminé')
     <div class="alert alert-warning" role="alert">
-        <h5 class="alert-heading">Vous avez terminé tous vos pointage pour aujourd'hui.</h5>
+        <h5 class="alert-heading">Vous avez terminé tous vos pointages pour aujourd'hui.</h5>
         <p>On vous revoit demain !</p>
     </div>
+    @elseif($boutton != 'terminé')
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">Vous n'avez pas terminé tous vos pointages hier.</h5>
+        <p>Veuillez refaire votre pointage  !</p>
+    </div>
     @endif
+    <div>
+        <form>
+            @csrf
+            <input type="hidden" name="pointage_id" >
+        </form>
+    </div>
 </div>
 @endsection
