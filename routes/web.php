@@ -52,4 +52,7 @@ Route::get('modifier_entrer', [PointageController::class,'update_entrer'])->name
 Route::get('modifier_sortie', [PointageController::class,'update_sortie'])->name('modifier_sortie');
 
 
+Route::get('/feuille_de_temps', function () {
+    return view('pointage.feuille_de_temps');
+});
 
