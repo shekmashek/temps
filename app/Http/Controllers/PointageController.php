@@ -13,7 +13,7 @@ class PointageController extends Controller
         $this->heure_actuel  = date('H:i:s', time());
     }
 
-    public function valeur_pointage(){
+    public function valeur_pointage_now(){
         $pointage = DB::table('temps_pointage')
             ->where('employer_id', $this->user_id)
             ->whereDate('jour', now())
@@ -22,29 +22,64 @@ class PointageController extends Controller
     }
 
     public function entrer(Request $request){
-        $valeur_pointage = $this->valeur_pointage();
-        if($valeur_pointage->isEmpty()) DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+        $valeur_pointage = $this->valeur_pointage_now();
+        if($valeur_pointage->isEmpty()) {
+            DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+            return redirect()->back();
+        }
         elseif($valeur_pointage->isNotEmpty())
             if($valeur_pointage[0]->entree)
                 return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
-        return redirect()->back();
+        elseif($valeur_pointage->isEmpty()){
+            $boutton = 'oublie_sortie';
+            return view('pointage.pointage',compact('boutton'));
+        }
     }
 
     public function sortie(Request $request){
-        $valeur_pointage = $this->valeur_pointage();
-            // dd($valeur_pointage);
+        $valeur_pointage = $this->valeur_pointage_now();
         if($valeur_pointage->isNotEmpty()){
             if($valeur_pointage[0]->sortie == null){
                 DB::table('temps_pointage')
                     ->where('id', $valeur_pointage[0]->id)
                     ->update(['sortie' => $this->heure_actuel]);
+                return redirect()->back();
             }
             elseif($valeur_pointage[0]->sortie) return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->sortie);
         }elseif($valeur_pointage->isEmpty()){
             $boutton = 'oublie_entree';
-            $msg = 'Vous devez devez pointer votre entrée';
             return view('pointage.pointage',compact('boutton'));
         }
-        return redirect()->back();
+    }
+
+    public function update_entrer(Request $request){
+        $valeur_pointage = $this->valeur_pointage_now();
+        if($valeur_pointage->isEmpty()) {
+            DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+            return redirect()->back();
+        }
+        elseif($valeur_pointage->isNotEmpty())
+            if($valeur_pointage[0]->entree)
+                return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->entree);
+        elseif($valeur_pointage->isEmpty()){
+            $boutton = 'oublie_sortie';
+            return view('pointage.pointage',compact('boutton'));
+        }
+    }
+
+    public function update_sortie(Request $request){
+        $valeur_pointage = $this->valeur_pointage_now();
+        if($valeur_pointage->isNotEmpty()){
+            if($valeur_pointage[0]->sortie == null){
+                DB::table('temps_pointage')
+                    ->where('id', $valeur_pointage[0]->id)
+                    ->update(['sortie' => $this->heure_actuel]);
+                return redirect()->back();
+            }
+            elseif($valeur_pointage[0]->sortie) return redirect()->back()->with('error',"Vous avez déjà fait un pointage d'entrée à ".$valeur_pointage[0]->sortie);
+        }elseif($valeur_pointage->isEmpty()){
+            $boutton = 'oublie_entree';
+            return view('pointage.pointage',compact('boutton'));
+        }
     }
 }
