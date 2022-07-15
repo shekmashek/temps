@@ -18,7 +18,7 @@ class PointageController extends Controller
         $pointage = DB::table('temps_pointage')
             ->where('employer_id', $this->user_id)
             ->whereDate('jour', now())
-            ->get(['entree','sortie','id']);
+            ->get(['entree','sortie']);
         return $pointage;
     }
 
@@ -26,7 +26,7 @@ class PointageController extends Controller
         $pointage = DB::table('temps_pointage')
             ->where('employer_id', $this->user_id)
             ->whereDate('jour', Carbon::yesterday())
-            ->get(['entree','sortie','id']);
+            ->get(['entree','sortie','id','heure_pause']);
         return $pointage;
     }
 
@@ -37,10 +37,13 @@ class PointageController extends Controller
         if($valeur_pointage_hier->isNotEmpty()){
             if(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie == null)){
                 // sady mampiditra entrée no manao redirect modification sortie omaly
-                DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+                if($valeur_pointage->isEmpty()) {
+                    DB::insert("insert into temps_pointage (employer_id, entree) values (".$this->user_id.",'".$this->heure_actuel."')");
+                }
                 $boutton = 'oublie_sortie';
                 $pointage_id = $valeur_pointage_hier[0]->id;
-                return view('pointage.pointage',compact('boutton','pointage_id'));
+                $pause_hier = $valeur_pointage_hier[0]->heure_pause;
+                return view('pointage.pointage',compact('boutton','pointage_id','pause_hier'));
             }
             elseif(($valeur_pointage_hier[0]->entree and $valeur_pointage_hier[0]->sortie)){
                 // rehefa tsisy adino omaly dia mijery hoe mbola tsisy pointage androany dia mampiditra
@@ -102,7 +105,7 @@ class PointageController extends Controller
         DB::table('temps_pointage')
             ->where('id', $request->pointage_id)
             ->update(['entree' => $request->modif_entree]);
-        return redirect()->back();
+        return redirect('/home');
     }
 
     public function update_sortie(Request $request){

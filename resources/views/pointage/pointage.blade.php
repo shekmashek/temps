@@ -43,6 +43,7 @@
         <form action={{route('modifier_sortie')}} >
             @csrf
             <input type="time" name="modif_sortie">
+            <input type="number" name="heure_pause" value="{{ $pause_hier }}">
             <input type="text" name="pointage_id" value="{{ $pointage_id}}" hidden>
             <input type="submit" value="Valider">
         </form>
