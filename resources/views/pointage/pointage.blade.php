@@ -5,6 +5,16 @@
 @endsection
 @section('content')
 <div align="center">
+    @if(session()->has('msg'))
+            <div class="alert alert-success">
+                {{ session()->get('msg') }}
+            </div>
+    @endif
+    @if(session()->has('error'))
+            <div class="alert alert-danger">
+                {{ session()->get('error') }}
+            </div>
+    @endif
     @if($boutton == 'entrée')
     <div style="display: inline-block">
         <form action={{route('valider_entrer')}} >
@@ -20,10 +30,10 @@
         </form>
     </div>
     <br>
-    @else
+    @elseif($boutton == 'terminé')
     <div class="alert alert-warning" role="alert">
-        <h4 class="alert-heading">Attention</h4>
-        <p>Vous avez déjà effectué un pointage</p>
+        <h5 class="alert-heading">Vous avez terminé tous vos pointage pour aujourd'hui.</h5>
+        <p>On vous revoit demain !</p>
     </div>
     @endif
 </div>
