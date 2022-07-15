@@ -26,7 +26,7 @@
     <div style="display: inline-block">
         <form action={{route('valider_entrer')}} >
             @csrf
-            <input type="time" id="appt" name="appt">
+            <input type="time" name="modif_entree">
             <input type="submit" value="Validez">
         </form>
     </div>
@@ -41,7 +41,7 @@
     <div style="display: inline-block">
         <form action={{route('valider_entrer')}} >
             @csrf
-            <input type="time" id="appt" name="appt">
+            <input type="time" name="modif_sortie">
             <input type="submit" value="Validez">
         </form>
     </div>
