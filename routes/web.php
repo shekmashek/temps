@@ -51,8 +51,10 @@ Route::get('valider_sortie', [PointageController::class,'sortie'])->name('valide
 Route::get('modifier_entrer', [PointageController::class,'update_entrer'])->name('modifier_entrer');
 Route::get('modifier_sortie', [PointageController::class,'update_sortie'])->name('modifier_sortie');
 
-
+// affichage feuille de temps
 Route::get('/feuille_de_temps', function () {
     return view('pointage.feuille_de_temps');
 });
 
+// insertion feuille de temps
+Route::post('valider_feuille_de_temps', [PointageController::class,'valider_feuille_de_temps'])->name('valider_feuille_de_temps');

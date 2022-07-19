@@ -117,4 +117,20 @@ class PointageController extends Controller
             ->update(['sortie' => $request->modif_sortie, 'heure_pause' => $request->modif_pause]);
         return redirect('/home');
     }
+
+    public function valider_feuille_de_temps(Request $request){
+        $response = array();
+        for ($i = 0; $i < 7; $i += 1) {
+            $response[] = array(
+                "employer_id"=>$this->user_id,
+                "jour" => $request["date_".$i],
+                "entree" => $request["entree_".$i],
+                "heure_pause" => $request["pause_".$i],
+                "sortie" => $request["sortie_".$i],
+            );
+        }
+        DB::table('temps_pointage')->insert($response);
+        return redirect()->back();
+    }
+
 }
