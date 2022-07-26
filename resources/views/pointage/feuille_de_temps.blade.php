@@ -60,9 +60,9 @@
             <div class="col-md-10 jusitfy-content-center">
                 <form name="formInsert" id="formInsert" action="{{ route('valider_feuille_de_temps')}}" method="POST" enctype="multipart/form-data" class="form_insert_formateur form_colab  needs-validation" novalidate>
                     @csrf
-                    @if(Session::has('success'))
+                    @if(Session::has('msg'))
                     <div class="alert alert-success">
-                        <strong>{{Session::get('success')}}</strong>
+                        {{Session::get('msg')}}
                     </div>
                     @endif
                     @if(Session::has('error'))
@@ -101,37 +101,27 @@
                             @for($i = 0; $i < 7; $i++)
                             <tr>
                                 <td>
-                                    <input class="form-control " type="text" readonly style="background: background" name="object" id="date_text_{{$i}}">
-                                    <input class="form-control " type="date" hidden style="background: background" name="date_{{$i}}" id="date_{{$i}}">
+                                    <input class="form-control " type="text" readonly style="background: background" name="object[{{$i}}]" id="date_text_{{$i}}">
+                                    <input class="form-control " type="date" hidden style="background: background" name="date[{{$i}}]" id="date_{{$i}}">
                                 </td>
                                 <td class="heure">
-                                    <input class="form-control "  type="time" name="entree_{{$i}}" value="08:00">
+                                    <input class="form-control "  type="time" name="entree[{{$i}}]" value="08:00" id="entree_{{$i}}">
                                 </td>
                                 <td class="pause">
-                                    <input class="form-control " type="number" name="pause_{{$i}}" value="0">
+                                    <input class="form-control " type="number" name="pause[{{$i}}]" value="1" id="pause_{{$i}}">
                                 </td>
                                 <td class="heure">
-                                    <input class="form-control " type="time" name="sortie_{{$i}}" value="17:00">
+                                    <input class="form-control " type="time" name="sortie[{{$i}}]" value="17:00" id="sortie_{{$i}}">
                                 </td>
                                 <td>
-                                    <input class="form-control " type="number" readonly style="background: background" name="total_{{$i}}">
+                                    <input class="form-control " type="text" readonly style="background: background" name="total[{{$i}}]" id="total_{{$i}}">
                                 </td>
                                 </tr>
                                 @endfor
                             <tr>
                                 <td colspan="3" class="border-0 "></td>
-                                <td>heure normales : </td>
-                                <td>40 heures</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="border-0 "></td>
-                                <td>heure supplémentaires : </td>
-                                <td>0 heures</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="border-0 "></td>
                                 <td>Total semaine : </td>
-                                <td>40 heures</td>
+                                <td><input type="text" readonly id="sommeTotale" value="0"></td>
                             </tr>
                             <tr>
                                 <td colspan="3" class="border-0 "></td>
@@ -197,5 +187,98 @@ let parseDates = (inp) => {
     }
     // return days;
 }
+
+// calcul de durée de travail
+function calcul_Difference_temps(element1,element2,elementTotale,elementPause) {
+    var time1 = element1.val().split(':'), time2 = element2.val().split(':');
+    var hours1 = parseInt(time1[0], 10),
+        hours2 = parseInt(time2[0], 10),
+        mins1 = parseInt(time1[1], 10),
+        mins2 = parseInt(time2[1], 10);
+    var hours = hours2 - hours1, mins = 0;
+
+    let startDate = new Date(2020,05,05,hours1,mins1,0),
+        endDate = new Date(2020,05,05,hours2,mins2,0);
+
+    // heure de travail = sortie - entrée - pause
+    let difference = endDate.getTime() - startDate.getTime() - (elementPause.val()*3600*1000);
+
+    // si la valeur est negative on ajoute 24heure
+    if (difference < 0) difference = 24*3600*1000 + difference;
+
+    // calcul conversion en heure, ensuite en minute, après les restes sont les secondes
+    difference = difference / 1000;
+    let hourDifference = Math.floor(difference / 3600);
+    difference -= hourDifference * 3600;
+    let minuteDifference = Math.floor(difference / 60);
+    difference -= minuteDifference * 60;
+
+    // rendre le resultat en heure normale
+    hourDifference = formatHeureMinute(hourDifference);
+    minuteDifference = formatHeureMinute(minuteDifference);
+    TimeTotal = formatHeures(hourDifference, minuteDifference);
+    elementTotale.val(TimeTotal);
+
+    // calcul de la somme Totale des heures de travails par jour
+    sommeTotale();
+}
+
+// fonctions necessaire pour le format des heures et minutes
+function formatHeureMinute(element){
+    if(element < 10)element = '0'+element;
+    return element;
+}
+function formatHeures(element1, element2){
+    // let totalDate = new Date(2020,05,05,element1,element2,0);
+    // const [dateTotal, TimeTotal] = formatDate(totalDate).split(' ');
+
+    const separateur = ' h ';//si vous modifiezle separateur, modifier aussi le separateur du split dans la fonction sommeTotale
+    return element1+separateur+element2;
+}
+
+function sommeTotale(){
+    var sommeHourTotale = 0, sommeMinutesTotale = 0, timeTotale, hoursTotale, minsTotale;
+    for(var i=0; i<7 ; i++){
+        elementTotale = $("#total_".concat(i));
+        timeTotale = elementTotale.val().split(' h ');
+        hoursTotale = parseInt(timeTotale[0], 10);
+        minsTotale = parseInt(timeTotale[1], 10);
+
+        sommeHourTotale += hoursTotale;
+        sommeMinutesTotale += minsTotale;
+
+        // limite minutes rendre en heure
+        if(sommeMinutesTotale>=60){
+            sommeMinutesTotale = sommeMinutesTotale%60;
+            sommeHourTotale += 1;
+        }
+    }
+
+    sommeMinutesTotale = formatHeureMinute(sommeMinutesTotale);
+    $("#sommeTotale").val(formatHeures(sommeHourTotale, sommeMinutesTotale));
+
+}
+
+$(function () {
+    // valeur heure par defaut des jours de weekend = 00h00 pcq l'utilisateur ne travaille pas les weekend par defaut
+    $("#entree_5").val("00:00"),$("#sortie_5").val("00:00"),$("#pause_5").val(0);
+    $("#entree_6").val("00:00"),$("#sortie_6").val("00:00"),$("#pause_6").val(0);
+
+    var element1, element2, elementTotale, hoursTotale, minsTotale;
+    for(var i=0; i<7 ; i++){
+        element1 = $("#entree_".concat(i));
+        element2 = $("#sortie_".concat(i));
+        elementTotale = $("#total_".concat(i));
+        elementPause = $("#pause_".concat(i));
+
+        calcul_Difference_temps(element1,element2,elementTotale,elementPause);
+
+        element1.add(element2).add(elementPause).on("change", function(e){
+            var indice = this.id.split('_')[1];
+            calcul_Difference_temps($("#entree_".concat(indice)),$("#sortie_".concat(indice)),$("#total_".concat(indice)),$("#pause_".concat(indice)));
+        });
+    }
+});
+
 </script>
 @endsection

@@ -14,6 +14,14 @@ class PointageController extends Controller
         $this->heure_actuel  = date('H:i:s', time());
     }
 
+    public function valeur_pointage_cette_semaine($lundi, $dimanche){
+        $pointage = DB::table('temps_pointage')
+            ->where('employer_id', $this->user_id)
+            ->whereBetween('jour', [$lundi, $dimanche])
+            ->get('id');
+        return $pointage;
+    }
+
     public function valeur_pointage_maintenant(){
         $pointage = DB::table('temps_pointage')
             ->where('employer_id', $this->user_id)
@@ -119,18 +127,27 @@ class PointageController extends Controller
     }
 
     public function valider_feuille_de_temps(Request $request){
-        $response = array();
-        for ($i = 0; $i < 7; $i += 1) {
-            $response[] = array(
-                "employer_id"=>$this->user_id,
-                "jour" => $request["date_".$i],
-                "entree" => $request["entree_".$i],
-                "heure_pause" => $request["pause_".$i],
-                "sortie" => $request["sortie_".$i],
-            );
+        // verification si user a fait un choix de semaine
+        if(in_array(null, $request->date, true))return redirect()->back()->with('error',"Vous devez choisir la semaine pour le pointage.");
+
+        // verification si il y a deja eu de pointage durant la semaine choisie
+        $valeur_pointage_cette_semaine = $this->valeur_pointage_cette_semaine($request->date[0],$request->date[count($request->object)-1]);
+        if($valeur_pointage_cette_semaine->isEmpty()){
+            $response = array();
+            for ($i = 0; $i < count($request->object); $i += 1) {
+                $response[] = array(
+                    "employer_id"=>$this->user_id,
+                    "jour" => $request->date[$i],
+                    "entree" => $request->entree[$i],
+                    "heure_pause" => $request->pause[$i],
+                    "sortie" => $request->sortie[$i],
+                );
+            }
+            DB::table('temps_pointage')->insert($response);
+            return redirect()->back()->with('msg',"Insertion des pointages reussi. Merci, À la prochaine ! ");
         }
-        DB::table('temps_pointage')->insert($response);
-        return redirect()->back();
+        elseif($valeur_pointage_cette_semaine->isNotEmpty())return redirect()->back()->with('error',"Vous avez déjà terminé les pointages de la semaine.");
+
     }
 
 }

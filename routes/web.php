@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ConditionController;
 use App\Http\Controllers\PointageController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HeureSupplementaireController;
 
 
 Route::get('/', function () {
@@ -58,3 +59,6 @@ Route::get('/feuille_de_temps', function () {
 
 // insertion feuille de temps
 Route::post('valider_feuille_de_temps', [PointageController::class,'valider_feuille_de_temps'])->name('valider_feuille_de_temps');
+
+// liste heure supplementaire
+Route::get('liste_heure_supplementaire', [HeureSupplementaireController::class,'liste'])->name('liste_heure_supplementaire');
