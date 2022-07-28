@@ -25,10 +25,10 @@ from totaleHeureDeTravail;
 -- liste heure supplementaire
 CREATE or REPLACE VIEW listeHeureSup as;
 SELECT id, entree, sortie, debut, fin,duree,jour,heure_pause,week(jour) semaine,month(jour) mois,year(jour) annee
-from heure_supplementaire_jour
+from temps_heure_supplementaire_jour
 UNION
 SELECT id, entree, sortie, debut, fin,duree,jour,heure_pause,week(jour) semaine,month(jour) mois,year(jour) annee
-from heure_de_nuit
+from temps_heure_de_nuit
 ORDER BY jour;
 
 -- totale heure sup semaine
@@ -175,7 +175,7 @@ ORDER BY jour;
 -- 0 ou 50
 -- liste jour entre debut -> 10pm
 
-CREATE or REPLACE VIEW heure_supplementaire_jour_apres_sortie as;
+CREATE or REPLACE VIEW temps_heure_supplementaire_jour_apres_sortie as;
 SELECT
     id,heure_pause,entree,sortie,
     -- verification si la sortie est à la date du jour ou le jour suivant
@@ -213,7 +213,7 @@ WHERE entree != '00:00:00' and sortie != '00:00:00'
 
 -- liste jour entre 05am -> fin
 -- mbola tsy mety ny double heure sup avant entrée ohatra hoe raha niditra t@ 7 izy nefa t@ 6 ampitso vao nirava
-CREATE or REPLACE VIEW heure_supplementaire_jour_avant_entree as;
+CREATE or REPLACE VIEW temps_heure_supplementaire_jour_avant_entree as;
 SELECT
     id,heure_pause,entree,sortie,
     -- verification si la sortie est à la date du jour ou le jour suivant
@@ -265,21 +265,21 @@ where
     OR entree < time '08:00:00')
 ;
 
--- regrouper les heures de jour dans cette VIEW heure_supplementaire_jour
-CREATE or REPLACE view heure_supplementaire_jour as;
+-- regrouper les heures de jour dans cette VIEW temps_heure_supplementaire_jour
+CREATE or REPLACE view temps_heure_supplementaire_jour as;
 select id,debut,fin,duree,jour,heure_pause,entree,sortie
 from
-heure_supplementaire_jour_avant_entree
-where heure_supplementaire_jour_avant_entree.duree >= 1
+temps_heure_supplementaire_jour_avant_entree
+where temps_heure_supplementaire_jour_avant_entree.duree >= 1
 UNION
 select id,debut,fin,duree,jour,heure_pause,entree,sortie
 from
-heure_supplementaire_jour_apres_sortie
-WHERE heure_supplementaire_jour_apres_sortie.duree >= 1
+temps_heure_supplementaire_jour_apres_sortie
+WHERE temps_heure_supplementaire_jour_apres_sortie.duree >= 1
 ;
 
 -- liste heure sup entre 22h -> 05h
-CREATE or REPLACE VIEW heure_de_nuit as;
+CREATE or REPLACE VIEW temps_heure_de_nuit as;
 -- requete imbriqée pour la condition where durée >= 1 et avoir les attriubts necessaires
 SELECT id,debut,fin,duree,jour,heure_pause,entree,sortie
 from (
@@ -337,7 +337,7 @@ from (
         end > time '22:00:00'
         -- pour heure d'entrée avant 5am [ 00h à 05h ]
         OR entree < time '05:00:00')
-)as heure_de_nuit
+)as temps_heure_de_nuit
 where duree >= 1
 ;
 
