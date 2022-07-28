@@ -16,10 +16,10 @@ class HeureSupplementaireController extends Controller
     }
 
     public function liste(){
-        $liste = HeureSupplementaire::all();
+        // $liste = HeureSupplementaire::all();
         $hs = new HeureSupplementaire();
-        // $liste = $hs->HeureSupHuit();
-        dd($liste);
+        $liste = $hs->liste_heure_supplementaire();
+        return ($liste);
     }
 
 }

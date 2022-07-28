@@ -22,16 +22,18 @@ class HeureSupplementaire extends Model
         return $liste;
     }
 
-    public function HeureJours(){
-        $results = array();
-        foreach($this::all() as $jour){
-
-        }
+    public function liste_heure_supplementaire()
+    {
+        $heure_supplementaire_avant_huit = DB::select('select * from heure_supplementaire_avant_huit ');
+        $heure_supplementaire_apres_huit = DB::select('select * from heure_supplementaire_apres_huit ');
+        $heure_supplementaire_jour = DB::select('select * from heure_supplementaire_jour ');
+        $heure_supplementaire_nuit = DB::select('select * from heure_supplementaire_nuit ');
+        return response()->json([
+            'heure_supplementaire_avant_huit'=> $heure_supplementaire_avant_huit,
+            'heure_supplementaire_apres_huit'=> $heure_supplementaire_apres_huit,
+            'heure_supplementaire_jour'=>$heure_supplementaire_jour,
+            'heure_supplementaire_nuit'=> $heure_supplementaire_nuit
+        ]);
     }
-
-// heure de travail > heure normale
-// maka 8 premières heures
-// heure de jour ou heure de nuit
-// type de jour: ouvrable, dimanche, férié
 
 }

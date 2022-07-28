@@ -62,3 +62,8 @@ Route::post('valider_feuille_de_temps', [PointageController::class,'valider_feui
 
 // liste heure supplementaire
 Route::get('liste_heure_supplementaire', [HeureSupplementaireController::class,'liste'])->name('liste_heure_supplementaire');
+
+// affichage calendrier
+Route::get('/calendrier', function () {
+    return view('heure_supplementaire.calendrier');
+});
