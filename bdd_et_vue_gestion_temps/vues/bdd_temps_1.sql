@@ -30,10 +30,10 @@ SELECT
         then DATE_ADD((SELECT fin),interval 24 hour)
         else (SELECT fin)
     end as 'var_fin',
-    timestampDiff(minute, (SELECT debut), (SELECT var_fin)) var_Hsup,
+    timestampDiff(minute, (SELECT debut), (SELECT var_fin)) duree_minute,
     Case
-        when (SELECT var_Hsup) < 0 then 0
-        else (SELECT var_Hsup/60)
+        when (SELECT duree_minute) < 0 then 0
+        else (SELECT duree_minute/60)
     end as 'duree',
     jour,
     week(jour) semaine,
@@ -48,7 +48,7 @@ SELECT id,debut, entree,fin, sortie,duree,jour,heure_pause
 from heure_supplementaire_jour
 UNION
 SELECT id,debut, entree,fin, sortie,duree,jour,heure_pause
-from heure_supplementaire_nuit
+from heure_de_nuit
 ORDER BY jour;
 
 -- totale heure sup semaine
@@ -137,7 +137,7 @@ UNION
 SELECT id,debut,fin,duree,jour FROM DebutJourHuit
 ORDER BY jour;
 
-CREATE or REPLACE VIEW FinJourHuit as
+CREATE or REPLACE VIEW FinJourHuit as;
 SELECT
     id,
     jour,
@@ -193,90 +193,96 @@ ORDER BY jour;
 ---- MAJORATION: durée, type de majoration, jour
 -- heure de jour ou heure de nuit
 -- 0 ou 50
--- mbola tsisy hoe sady manao heure sup maraina izy no nanao heure sup hariva
 -- liste jour entre debut -> 10pm
 
-CREATE or REPLACE VIEW heure_supplementaire_jour_apres_sortie as
+CREATE or REPLACE VIEW heure_supplementaire_jour_apres_sortie as;
 SELECT
     id,heure_pause,entree,sortie,
+    -- verification si la sortie est à la date du jour ou le jour suivant
     case
         when sortie <= entree and entree != '00:00:00' and sortie != '00:00:00'
+        -- ajouter 24 heures pour les jours d'après
         then DATE_ADD(sortie,interval 24 hour)
         else sortie
-    end as 'var_fin',
+    end as sortie_today_or_tomorrow,
     CASE
+        -- balisage heure de debut d'heure supp à l'heure conventionnelle
         when entree < time '08:00:00'
-        then entree
+        -- heure de sortie conventionnelle = 8am + 8 heures + avec pause
+        then DATE_ADD(time '08:00:00', interval (8 + heure_pause)*60 minute)
+        -- heure de sortie conventionnelle = heure d'entrée + 8 heures + avec pause
         else DATE_ADD(entree, interval (8 + heure_pause)*60 minute)
     end as debut,
     case
-        when (SELECT var_fin) > '22:00:00'
+        -- balisage heure de sortie à 10pm
+        when (SELECT sortie_today_or_tomorrow) > '22:00:00'
         then time '22:00:00'
-        when entree < time '08:00:00'
-        then time '08:00:00'
-        else (SELECT var_fin)
+        else sortie
     end as 'fin',
-    timestampDiff(minute, (SELECT debut), (SELECT fin)) var_Hsup,
+    -- durée d'heure supp en minutes
+    timestampDiff(minute, (SELECT debut), (SELECT fin)) duree_minute,
+    -- durée d'heure sup en heure
     Case
-        when (SELECT var_Hsup) < 0 then 0
-        else (SELECT var_Hsup/60)
+        when (SELECT duree_minute) < 0 then 0
+        else (SELECT duree_minute/60)
     end as 'duree',
     jour
 from temps_pointage
 WHERE entree != '00:00:00' and sortie != '00:00:00'
 ;
--- liste jour entre 05am -> fin
--- else DATE_ADD(entree, interval (8 + heure_pause)*60 minute)
 
-CREATE or REPLACE VIEW heure_supplementaire_jour_avant_entree as
+-- liste jour entre 05am -> fin
+-- mbola tsy mety ny double heure sup avant entrée ohatra hoe raha niditra t@ 7 izy nefa t@ 6 ampitso vao nirava
+CREATE or REPLACE VIEW heure_supplementaire_jour_avant_entree as;
 SELECT
     id,heure_pause,entree,sortie,
-    DATE_ADD(entree, interval (8 + heure_pause)*60 minute) as var_debut,
-    CASE
-        when entree < time '08:00:00'
-        then entree
-        else DATE_ADD(entree, interval (8 + heure_pause)*60 minute)
-    end as var_entree,
-    CASE
-        when (SELECT var_entree) < time '08:00:00'
-        then time '08:00:00'
-        else sortie
-    end as var_sortie,
+    -- verification si la sortie est à la date du jour ou le jour suivant
     case
-        when (SELECT var_sortie) <= (SELECT var_entree) and (SELECT var_entree) != '00:00:00' and (SELECT var_sortie) != '00:00:00'
-        then DATE_ADD((SELECT var_sortie),interval 24 hour)
-        else (SELECT var_sortie)
-    end as var_fin,
+        when sortie <= entree and entree != '00:00:00' and sortie != '00:00:00'
+        -- ajouter 24 heures pour les jours d'après
+        then DATE_ADD(sortie,interval 24 hour)
+        else sortie
+    end as sortie_today_or_tomorrow,
     CASE
-        when (SELECT var_entree) < time '08:00:00'
-        then
-            CASE
-                when (SELECT var_entree) < time '05:00:00'
-                then time '05:00:00'
-                else (SELECT var_entree)
-                end
-        else DATE_ADD((SELECT var_entree), interval (8 + heure_pause)*60 minute)
+        -- balisage heure d'entrée à 5am
+        when entree < time '05:00:00'
+        then time '05:00:00'
+        -- heure de sortie demain après 5am
+        when (SELECT sortie_today_or_tomorrow) > DATE_ADD(time '24:00:00',interval 5 hour)
+        then time '05:00:00'
+        else entree
     end as debut,
-    CASE
-        when (SELECT var_entree) < time '08:00:00'
-        then time '08:00:00'
-        else (SELECT var_sortie)
+    -- balisage heure de fin d'heure supp à 8am ou à l'heure de sortie conventionnelle
+    case
+        when (SELECT sortie_today_or_tomorrow) < time '17:00:00'
+        -- heure de sortie conventionnelle = 8 heure - durée d'heure de travail (avec pause)
+        then DATE_ADD(sortie, interval -(8 + heure_pause)*60 minute)
+        -- heure de sortie demain après 5am
+        when (SELECT sortie_today_or_tomorrow) > DATE_ADD(time '24:00:00',interval 5 hour)
+        then sortie
+        else time '08:00:00'
     end as fin,
-    timestampDiff(minute, (SELECT debut), (SELECT fin)) var_Hsup,
+    -- durée d'heure supp en minutes
+    timestampDiff(minute, (SELECT debut), (SELECT fin)) duree_minute,
+    -- durée d'heure sup en heure
     Case
-        when (SELECT var_Hsup) < 0 then 0
-        else (SELECT var_Hsup/60)
+        when (SELECT duree_minute) < 0 then 0
+        else (SELECT duree_minute/60)
     end as 'duree',
     jour
 from temps_pointage
 where
-    case
+    --condition pour les jours non travaillés
+    entree != '00:00:00' and sortie != '00:00:00' and
+    -- condition similaire pour sortie_today_or_tomorrow
+    (case
         when sortie <= entree
         then DATE_ADD(sortie,interval 24 hour)
         else sortie
+    -- heure de sortie demain après 5am
     end > DATE_ADD(time '24:00:00',interval 5 hour)
-OR entree < time '08:00:00'
-and entree != '00:00:00' and sortie != '00:00:00'
+    -- heure d'entrée avant 8am
+    OR entree < time '08:00:00')
 ;
 
 CREATE or REPLACE view heure_supplementaire_jour as
@@ -287,54 +293,64 @@ UNION
 select id,debut,fin,duree,jour,heure_pause,entree,sortie
 from
 heure_supplementaire_jour_apres_sortie
-where id not in (select id from heure_supplementaire_jour_avant_entree)
 ;
 
 -- liste heure sup entre 22h -> 05h
-CREATE or REPLACE VIEW heure_supplementaire_nuit as
+CREATE or REPLACE VIEW heure_de_nuit as;
 SELECT
-    id,entree,sortie,heure_pause,
-    DATE_ADD(entree, interval (8 + heure_pause)*60 minute) as var_debut,
+    id,entree,sortie,heure_pause,(entree < time '05:00:00'),
+    -- verification si la sortie est à la date du jour ou le jour suivant
     case
         when sortie <= entree and entree != '00:00:00' and sortie != '00:00:00'
+        -- ajouter 24 heures pour les jours d'après
         then DATE_ADD(sortie,interval 24 hour)
         else sortie
-    end as limite_fin,
+    end as sortie_today_or_tomorrow,
     case
-        when entree < time '08:00:00'
-        then entree
-        else time '22:00:00'
+        -- balisage heure d'entrée de [ 10pm à 5am ]
+        when time '05:00:00' < entree and  entree < time '22:00:00'
+        then time '22:00:00'
+        else entree
     end as debut,
     case
-        when entree < time '08:00:00'
+        -- balisage heure de sortie à 5am si le debut d'heure supp est entre [ 00h à 05h ]
+        when (SELECT debut) < time '05:00:00'
         then time '05:00:00'
-        when (select limite_fin) > DATE_ADD(time '24:00:00',interval 5 hour)
+        -- balisage heure de sortie à 5am si l'heure de fin est après 5am du jour après
+        when (select sortie_today_or_tomorrow) > DATE_ADD(time '24:00:00',interval 5 hour)
         then time '05:00:00'
         else sortie
     end as fin,
     case
+        -- ajouter 24h si heure de fin est dans la matinée du jour d'après [ 00h à 05h ]
         when (SELECT fin) <= (SELECT debut)
         then DATE_ADD((SELECT fin),interval 24 hour)
         else (SELECT fin)
     end as var_fin,
-    timestampDiff(minute, (SELECT debut), (SELECT var_fin)) var_Hsup,
+    -- durée d'heure supp en minutes
+    timestampDiff(minute, (SELECT debut), (SELECT var_fin)) duree_minute,
+    -- durée d'heure sup en heure
     Case
-        when (SELECT var_Hsup) < 0 then 0
-        else (SELECT var_Hsup/60)
+        when (SELECT duree_minute) < 0 then 0
+        else (SELECT duree_minute/60)
     end as 'duree',
     jour
 from temps_pointage
-WHERE entree != '00:00:00' and sortie != '00:00:00'
-and
+WHERE
+    --condition pour les jours non travaillés
+    entree != '00:00:00' and sortie != '00:00:00' and
+    -- condition similaire pour sortie_today_or_tomorrow
     (case
         when sortie <= entree
         then DATE_ADD(sortie,interval 24 hour)
         else sortie
+    -- pour heure de sortie après 10pm ou est dans le jour d'après
     end > time '22:00:00'
-    OR entree < time '08:00:00')
+    -- pour heure d'entrée avant 5am [ 00h à 05h ]
+    OR entree < time '05:00:00')
 ;
 
-select id,debut,fin,duree,jour from heure_supplementaire_nuit;
+select id,debut,fin,duree,jour from heure_de_nuit;
 
 
 -- type de jour: ouvrable, dimanche, férié
