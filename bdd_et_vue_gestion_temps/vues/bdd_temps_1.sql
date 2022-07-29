@@ -26,9 +26,9 @@ from totaleHeureDeTravail;
 -- 0 ou 50
 -- liste jour entre debut -> 10pm
 
-CREATE or REPLACE VIEW temps_heure_supplementaire_jour_apres_sortie as;
+CREATE or REPLACE VIEW temps_heure_supplementaire_jour_apres_sortie as
 SELECT
-    id,heure_pause,entree,sortie,
+    id,heure_pause,entree,sortie,employer_id,
     -- verification si la sortie est à la date du jour ou le jour suivant
     case
         when sortie <= entree and entree != '00:00:00' and sortie != '00:00:00'
@@ -64,9 +64,9 @@ WHERE entree != '00:00:00' and sortie != '00:00:00'
 
 -- liste jour entre 05am -> fin
 -- mbola tsy mety ny double heure sup avant entrée ohatra hoe raha niditra t@ 7 izy nefa t@ 6 ampitso vao nirava
-CREATE or REPLACE VIEW temps_heure_supplementaire_jour_avant_entree as;
+CREATE or REPLACE VIEW temps_heure_supplementaire_jour_avant_entree as
 SELECT
-    id,heure_pause,entree,sortie,
+    id,heure_pause,entree,sortie,employer_id,
     -- verification si la sortie est à la date du jour ou le jour suivant
     case
         when sortie <= entree and entree != '00:00:00' and sortie != '00:00:00'
@@ -118,24 +118,24 @@ where
 
 -- regrouper les heures de jour dans cette VIEW temps_heure_supplementaire_jour
 CREATE or REPLACE view temps_heure_supplementaire_jour as
-select id,debut,fin,duree,jour,heure_pause,entree,sortie,sortie_today_or_tomorrow
+select id,debut,fin,duree,jour,heure_pause,entree,sortie,employer_id
 from
 temps_heure_supplementaire_jour_avant_entree
 where temps_heure_supplementaire_jour_avant_entree.duree >= 1
 UNION
-select id,debut,fin,duree,jour,heure_pause,entree,sortie,sortie_today_or_tomorrow
+select id,debut,fin,duree,jour,heure_pause,entree,sortie,employer_id
 from
 temps_heure_supplementaire_jour_apres_sortie
 WHERE temps_heure_supplementaire_jour_apres_sortie.duree >= 1
 ;
 
 -- liste heure sup entre 22h -> 05h
-CREATE or REPLACE VIEW temps_heure_de_nuit as;
+CREATE or REPLACE VIEW temps_heure_de_nuit as
 -- requete imbriqée pour la condition where durée >= 1 et avoir les attriubts necessaires
-SELECT id,debut,fin,duree,jour,heure_pause,entree,sortie,sortie_today_or_tomorrow
+SELECT id,debut,fin,duree,jour,heure_pause,entree,sortie,employer_id
 from (
     SELECT
-        id,entree,sortie,heure_pause,(entree < time '05:00:00'),
+        id,entree,sortie,heure_pause,(entree < time '05:00:00'),employer_id,
         -- verification si la sortie est à la date du jour ou le jour suivant
         case
             when sortie <= entree and entree != '00:00:00' and sortie != '00:00:00'
@@ -199,10 +199,11 @@ where duree >= 1
 
 
 -- liste heure supplementaire
-CREATE or REPLACE VIEW temps_listeHeureSup as;
+CREATE or REPLACE VIEW temps_listeHeureSup as
 SELECT ROW_NUMBER() OVER (ORDER BY jour) rownumber,
         jour,
         id,
+        employer_id,
         entree,
         sortie,
         debut,
@@ -213,10 +214,10 @@ SELECT ROW_NUMBER() OVER (ORDER BY jour) rownumber,
         month(jour) mois,
         year(jour) annee
 from (
-    SELECT  jour, id, entree, sortie, debut, fin,duree,heure_pause
+    SELECT  jour, id, entree, sortie, debut, fin,duree,heure_pause,employer_id
     from temps_heure_supplementaire_jour
     UNION
-    SELECT  jour, id, entree, sortie, debut, fin,duree,heure_pause
+    SELECT  jour, id, entree, sortie, debut, fin,duree,heure_pause,employer_id
     from temps_heure_de_nuit
 ) as liste
 ORDER BY jour,rownumber asc;
@@ -229,7 +230,9 @@ ORDER BY jour,rownumber asc;
 CREATE or REPLACE VIEW temps_debutJourHuit as;
 SELECT
     id,
+    employer_id,
     jour,
+    week(jour) semaine,
     debut,
     duree,
 
@@ -255,7 +258,7 @@ SELECT
         else (SELECT var_fine)
     end as fin
 from
-temps_listeheuresup h1
+temps_listeheuresup h1;
 where (
     SELECT
         sum(h2.duree)
@@ -266,8 +269,8 @@ ORDER BY jour
 LIMIT 1
 ;
 
-CREATE or REPLACE VIEW temps_heure_supplementaire_avant_huit as;
-SELECT id,debut,fin,duree,jour FROM temps_listeheuresup l
+CREATE or REPLACE VIEW temps_heure_supplementaire_avant_huit as
+SELECT id,employer_id,debut,fin,duree,jour FROM temps_listeheuresup l
 WHERE jour < (
     SELECT jour
     from temps_debutJourHuit j
@@ -275,12 +278,13 @@ WHERE jour < (
     AND year(j.jour)=year(l.jour)
     )
 UNION
-SELECT id,debut,fin,duree,jour FROM temps_debutJourHuit
+SELECT id,employer_id,debut,fin,duree,jour FROM temps_debutJourHuit
 ORDER BY jour;
 
 CREATE or REPLACE VIEW temps_finJourHuit as
 SELECT
     id,
+    employer_id,
     jour,
     duree,
     fin,
@@ -319,8 +323,8 @@ ORDER BY jour
 LIMIT 1
 ;
 
-CREATE or REPLACE VIEW temps_heure_supplementaire_apres_huit as;
-SELECT id,debut,fin,duree,jour FROM temps_listeheuresup l
+CREATE or REPLACE VIEW temps_heure_supplementaire_apres_huit as
+SELECT id,employer_id,debut,fin,duree,jour FROM temps_listeheuresup l
 WHERE jour > (
     SELECT jour
     from temps_FinJourHuit j
@@ -328,5 +332,5 @@ WHERE jour > (
     AND year(j.jour)=year(l.jour)
     )
 UNION
-SELECT id,debut,fin,duree,jour FROM temps_finJourHuit
+SELECT id,employer_id,debut,fin,duree,jour FROM temps_finJourHuit
 ORDER BY jour;
