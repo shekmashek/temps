@@ -13,7 +13,7 @@ use App\Mail\create_new_compte\save_new_compte_etp_Mail;
 use App\Models\FonctionGenerique;
 use App\Models\getImageModel;
 use App\NouveauCompte;
-use App\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Image;

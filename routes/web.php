@@ -5,19 +5,7 @@ use App\Http\Controllers\ConditionController;
 use App\Http\Controllers\PointageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HeureSupplementaireController;
-
-
-Route::get('/', function () {
-    return view('index_accueil');
-})->name('accueil_perso');
-
-Route::get('sign-in', function () {
-    return view('auth.connexion');
-})->name('sign-in');
-
-Route::get('create-compte', function () {
-    return view('create_compte.create_compte');
-})->name('create-compte');
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/info_legale', function () {
     return view('/info_legale');
@@ -39,6 +27,21 @@ Route::get('/tarifs', function () {
     return view('/tarif');
 });
 Route::get('condition_generale_de_vente', [ConditionController::class,'index'])->name('condition_generale_de_vente');
+
+
+Auth::routes();
+
+Route::get('/', function () {
+    return view('index_accueil');
+})->name('accueil_perso');
+
+Route::get('sign-in', function () {
+    return view('auth.connexion');
+})->name('sign-in');
+
+Route::get('create-compte', function () {
+    return view('create_compte.create_compte');
+})->name('create-compte');
 
 
 // accueil affiche direct le clockpicker/pointage

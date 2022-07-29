@@ -199,7 +199,8 @@ where duree >= 1
 
 
 -- liste heure supplementaire
-CREATE or REPLACE VIEW temps_listeHeureSup as
+CREATE or REPLACE VIEW temps_listeHeureSup as;
+-- requete imbriquée pour avoir le numero de colonne
 SELECT ROW_NUMBER() OVER (ORDER BY jour) rownumber,
         jour,
         id,

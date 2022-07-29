@@ -129,14 +129,14 @@
                                                 <div class="col-5 text-center">
                                                     <div class="logout">
                                                         <a
-                                                        {{-- href="{{ route('logout') }}" --}}
+                                                        href="{{ route('logout') }}"
                                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();"></a>
                                                         <a
-                                                        {{-- href="{{ route('logout') }}" --}}
+                                                        href="{{ route('logout') }}"
                                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class=" text-center">Se déconnecter</a>
-                                                        {{-- <form action="{{ route('logout') }}" id="logout-form" method="POST" class="d-none">
+                                                        <form action="{{ route('logout') }}" id="logout-form" method="POST" class="d-none">
                                                             @csrf
-                                                        </form> --}}
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
