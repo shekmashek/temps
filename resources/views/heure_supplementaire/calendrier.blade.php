@@ -151,23 +151,23 @@ function liste_heure_supplementaire() {
         .then(result => result.json())
         .then(result => {
             return {
-                // heure_supplementaire_avant_huit : result.heure_supplementaire_avant_huit.map(r => ({
-                //     startDate: new Date(r.jour),
-                //     endDate: new Date(r.jour),
-                //     debut: r.debut,
-                //     fin: r.fin,
-                //     type: "premières 8 heures",
-                //     color: "red"
-                // })),
-                // heure_supplementaire_apres_huit : result.heure_supplementaire_apres_huit.map(r => ({
-                //     startDate: new Date(r.jour),
-                //     endDate: new Date(r.jour),
-                //     debut: r.debut,
-                //     fin: r.fin,
-                //     type: "après 8 heures d'heure supplementaire",
-                //     color: "blue"
-                // }))
-                // ,
+                heure_supplementaire_avant_huit : result.heure_supplementaire_avant_huit.map(r => ({
+                    startDate: new Date(r.jour),
+                    endDate: new Date(r.jour),
+                    debut: r.debut,
+                    fin: r.fin,
+                    type: "premières 8 heures",
+                    color: "red"
+                })),
+                heure_supplementaire_apres_huit : result.heure_supplementaire_apres_huit.map(r => ({
+                    startDate: new Date(r.jour),
+                    endDate: new Date(r.jour),
+                    debut: r.debut,
+                    fin: r.fin,
+                    type: "après 8 heures d'heure supplementaire",
+                    color: "orange"
+                }))
+                ,
                 heure_supplementaire_jour : result.heure_supplementaire_jour.map(r => ({
                     startDate: new Date(r.jour),
                     endDate: new Date(r.jour),
@@ -192,12 +192,12 @@ function liste_heure_supplementaire() {
 var data = calendar.getDataSource();
 liste_heure_supplementaire()
     .then(result => (
-        // result.heure_supplementaire_avant_huit.map(r => (
-        //     data.push(r)
-        // )),
-        // result.heure_supplementaire_apres_huit.map(r => (
-        //     data.push(r)
-        // )),
+        result.heure_supplementaire_avant_huit.map(r => (
+            data.push(r)
+        )),
+        result.heure_supplementaire_apres_huit.map(r => (
+            data.push(r)
+        )),
         result.heure_supplementaire_jour.map(r => (
             data.push(r)
         )),

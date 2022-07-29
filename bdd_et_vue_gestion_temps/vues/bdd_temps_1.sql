@@ -21,155 +21,6 @@ SELECT
 duree, semaine, annee
 from totaleHeureDeTravail;
 
-
--- liste heure supplementaire
-CREATE or REPLACE VIEW listeHeureSup as;
-SELECT id, entree, sortie, debut, fin,duree,jour,heure_pause,week(jour) semaine,month(jour) mois,year(jour) annee
-from temps_heure_supplementaire_jour
-UNION
-SELECT id, entree, sortie, debut, fin,duree,jour,heure_pause,week(jour) semaine,month(jour) mois,year(jour) annee
-from temps_heure_de_nuit
-ORDER BY jour;
-
--- totale heure sup semaine
-CREATE or REPLACE VIEW totaleHeureSup as
-SELECT SUM(duree) duree, week(jour) semaine, year(jour) annee
-from listeheuresup
-GROUP BY semaine,annee
-;
-SELECT
-duree,semaine,annee
-from totaleheuresup
-;
-
-CREATE or REPLACE VIEW HeureSupHuit as;
-SELECT
-    id, debut, fin, duree, jour,
-    (SELECT duree
-    from totaleHeureDeTravail t
-    where t.semaine=l.semaine
-    and t.annee=l.annee) as totalSemaine,
-    (SELECT duree
-    from totaleHeureSup t
-    where t.semaine=l.semaine
-    and t.annee=l.annee) as totalHeureSupSemaine,
-    semaine, annee
-from listeheuresup l
-ORDER BY semaine,annee
-;
-
-SELECT * FROM HeureSupHuit;
-;
----- SALAIRE DE BASE:
--- maka 8 premières heures
--- 130 ou 150
-
--- le jour où le total de durée est de 8h
-CREATE or REPLACE VIEW DebutJourHuit as;
-SELECT
-    id,
-    jour,
-    debut,fin,
-    duree,
-
-    (SELECT
-        sum(h2.duree)
-    from listeheuresup h2
-    WHERE h2.jour <= h1.jour
-    ) as reste,
-
-    CASE
-    WHEN (select reste) is NULL
-    then
-        case
-            when DATE_ADD(debut, interval 8*60 minute) > 24
-            then DATE_ADD(debut, interval (8 - 24)*60 minute)
-            else DATE_ADD(debut, interval 8*60 minute)
-        end
-    else DATE_ADD(debut, interval (SELECT 8*60 - reste*60) minute)
-    end as var_fine,
-    CASE
-        when (SELECT var_fine) > time '24:00'
-        then DATE_ADD((SELECT var_fine), interval -24*60 minute)
-        else (SELECT var_fine)
-    end as fin
-from
-listeheuresup h1;
-where (
-    SELECT
-        sum(h2.duree)
-    from HeureSupHuit h2
-    WHERE h2.jour <= h1.jour
-    ) >= 8
-ORDER BY jour
-LIMIT 1
-;
-
-CREATE or REPLACE VIEW heure_supplementaire_avant_huit as;
-SELECT id,debut,fin,duree,jour FROM listeheuresup l
-WHERE jour < (
-    SELECT jour
-    from DebutJourHuit j
-    WHERE week(j.jour)=week(l.jour)
-    AND year(j.jour)=year(l.jour)
-    )
-UNION
-SELECT id,debut,fin,duree,jour FROM DebutJourHuit
-ORDER BY jour;
-
-CREATE or REPLACE VIEW FinJourHuit as;
-SELECT
-    id,
-    jour,
-    duree,
-    fin,
-
-    (SELECT
-        sum(h2.duree)
-    from listeheuresup h2
-    WHERE h2.jour < h1.jour
-    ) as reste,
-
-    CASE
-    WHEN (select reste) is NULL
-    then
-        case
-            when DATE_ADD(debut, interval 8*60 minute) > 24
-            then DATE_ADD(debut, interval (8 - 24)*60 minute)
-            else DATE_ADD(debut, interval 8*60 minute)
-        end
-    else DATE_ADD(debut, interval (SELECT 8*60 - reste*60) minute)
-    end as var_fine,
-    CASE
-        when (SELECT var_fine) > time '24:00'
-        then DATE_ADD((SELECT var_fine), interval -24*60 minute)
-        else (SELECT var_fine)
-    end as debut
-
-from
-listeheuresup h1
-where (
-    SELECT
-        sum(h2.duree)
-    from HeureSupHuit h2
-    WHERE h2.jour <= h1.jour
-    ) >= 8
-ORDER BY jour
-LIMIT 1
-;
-
-CREATE or REPLACE VIEW heure_supplementaire_apres_huit as;
-SELECT id,debut,fin,duree,jour FROM listeheuresup l
-WHERE jour > (
-    SELECT jour
-    from FinJourHuit j
-    WHERE week(j.jour)=week(l.jour)
-    AND year(j.jour)=year(l.jour)
-    )
-UNION
-SELECT id,debut,fin,duree,jour FROM FinJourHuit
-ORDER BY jour;
-
 ---- MAJORATION: durée, type de majoration, jour
 -- heure de jour ou heure de nuit
 -- 0 ou 50
@@ -266,13 +117,13 @@ where
 ;
 
 -- regrouper les heures de jour dans cette VIEW temps_heure_supplementaire_jour
-CREATE or REPLACE view temps_heure_supplementaire_jour as;
-select id,debut,fin,duree,jour,heure_pause,entree,sortie
+CREATE or REPLACE view temps_heure_supplementaire_jour as
+select id,debut,fin,duree,jour,heure_pause,entree,sortie,sortie_today_or_tomorrow
 from
 temps_heure_supplementaire_jour_avant_entree
 where temps_heure_supplementaire_jour_avant_entree.duree >= 1
 UNION
-select id,debut,fin,duree,jour,heure_pause,entree,sortie
+select id,debut,fin,duree,jour,heure_pause,entree,sortie,sortie_today_or_tomorrow
 from
 temps_heure_supplementaire_jour_apres_sortie
 WHERE temps_heure_supplementaire_jour_apres_sortie.duree >= 1
@@ -281,7 +132,7 @@ WHERE temps_heure_supplementaire_jour_apres_sortie.duree >= 1
 -- liste heure sup entre 22h -> 05h
 CREATE or REPLACE VIEW temps_heure_de_nuit as;
 -- requete imbriqée pour la condition where durée >= 1 et avoir les attriubts necessaires
-SELECT id,debut,fin,duree,jour,heure_pause,entree,sortie
+SELECT id,debut,fin,duree,jour,heure_pause,entree,sortie,sortie_today_or_tomorrow
 from (
     SELECT
         id,entree,sortie,heure_pause,(entree < time '05:00:00'),
@@ -344,3 +195,138 @@ where duree >= 1
 -- type de jour: ouvrable, dimanche, férié
 -- sans ou 40 ou 100
 
+
+
+
+-- liste heure supplementaire
+CREATE or REPLACE VIEW temps_listeHeureSup as;
+SELECT ROW_NUMBER() OVER (ORDER BY jour) rownumber,
+        jour,
+        id,
+        entree,
+        sortie,
+        debut,
+        fin,
+        duree,
+        heure_pause,
+        week(jour) semaine,
+        month(jour) mois,
+        year(jour) annee
+from (
+    SELECT  jour, id, entree, sortie, debut, fin,duree,heure_pause
+    from temps_heure_supplementaire_jour
+    UNION
+    SELECT  jour, id, entree, sortie, debut, fin,duree,heure_pause
+    from temps_heure_de_nuit
+) as liste
+ORDER BY jour,rownumber asc;
+
+---- SALAIRE DE BASE:
+-- maka 8 premières heures
+-- 130 ou 150
+
+-- le jour où le total de durée est de 8h
+CREATE or REPLACE VIEW temps_debutJourHuit as;
+SELECT
+    id,
+    jour,
+    debut,
+    duree,
+
+    (SELECT
+        sum(h2.duree)
+    from temps_listeheuresup h2
+    WHERE h2.rownumber <= h1.rownumber
+    ) as reste,
+
+    CASE
+    WHEN (select reste) is NULL
+    then
+        case
+            when DATE_ADD(debut, interval 8*60 minute) > 24
+            then DATE_ADD(debut, interval (8 - 24)*60 minute)
+            else DATE_ADD(debut, interval 8*60 minute)
+        end
+    else DATE_ADD(debut, interval (SELECT 8*60 - reste*60) minute)
+    end as var_fine,
+    CASE
+        when (SELECT var_fine) > time '24:00'
+        then DATE_ADD((SELECT var_fine), interval -24*60 minute)
+        else (SELECT var_fine)
+    end as fin
+from
+temps_listeheuresup h1
+where (
+    SELECT
+        sum(h2.duree)
+    from temps_listeheuresup h2
+    WHERE h2.rownumber <= h1.rownumber
+    ) >= 8
+ORDER BY jour
+LIMIT 1
+;
+
+CREATE or REPLACE VIEW temps_heure_supplementaire_avant_huit as;
+SELECT id,debut,fin,duree,jour FROM temps_listeheuresup l
+WHERE jour < (
+    SELECT jour
+    from temps_debutJourHuit j
+    WHERE week(j.jour)=week(l.jour)
+    AND year(j.jour)=year(l.jour)
+    )
+UNION
+SELECT id,debut,fin,duree,jour FROM temps_debutJourHuit
+ORDER BY jour;
+
+CREATE or REPLACE VIEW temps_finJourHuit as
+SELECT
+    id,
+    jour,
+    duree,
+    fin,
+
+    (SELECT
+        sum(h2.duree)
+    from temps_listeheuresup h2
+    WHERE h2.rownumber <= h1.rownumber
+    ) as reste,
+
+    CASE
+    WHEN (select reste) is NULL
+    then
+        case
+            when DATE_ADD(debut, interval 8*60 minute) > 24
+            then DATE_ADD(debut, interval (8 - 24)*60 minute)
+            else DATE_ADD(debut, interval 8*60 minute)
+        end
+    else DATE_ADD(debut, interval (SELECT 8*60 - reste*60) minute)
+    end as var_fine,
+    CASE
+        when (SELECT var_fine) > time '24:00'
+        then DATE_ADD((SELECT var_fine), interval -24*60 minute)
+        else (SELECT var_fine)
+    end as debut
+
+from
+temps_listeheuresup h1
+where (
+    SELECT
+        sum(h2.duree)
+    from temps_listeheuresup h2
+    WHERE h2.rownumber <= h1.rownumber
+    ) >= 8
+ORDER BY jour
+LIMIT 1
+;
+
+CREATE or REPLACE VIEW temps_heure_supplementaire_apres_huit as;
+SELECT id,debut,fin,duree,jour FROM temps_listeheuresup l
+WHERE jour > (
+    SELECT jour
+    from temps_FinJourHuit j
+    WHERE week(j.jour)=week(l.jour)
+    AND year(j.jour)=year(l.jour)
+    )
+UNION
+SELECT id,debut,fin,duree,jour FROM temps_finJourHuit
+ORDER BY jour;

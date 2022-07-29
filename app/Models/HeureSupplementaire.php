@@ -24,13 +24,13 @@ class HeureSupplementaire extends Model
 
     public function liste_heure_supplementaire()
     {
-        // $heure_supplementaire_avant_huit = DB::select('select * from heure_supplementaire_avant_huit ');
-        // $heure_supplementaire_apres_huit = DB::select('select * from heure_supplementaire_apres_huit ');
-        $heure_supplementaire_jour = DB::select('select * from heure_supplementaire_jour ');
-        $heure_de_nuit = DB::select('select * from heure_de_nuit ');
+        $heure_supplementaire_avant_huit = DB::select('select * from temps_heure_supplementaire_avant_huit ');
+        $heure_supplementaire_apres_huit = DB::select('select * from temps_heure_supplementaire_apres_huit ');
+        $heure_supplementaire_jour = DB::select('select * from temps_heure_supplementaire_jour ');
+        $heure_de_nuit = DB::select('select * from temps_heure_de_nuit ');
         return response()->json([
-            // 'heure_supplementaire_avant_huit'=> $heure_supplementaire_avant_huit,
-            // 'heure_supplementaire_apres_huit'=> $heure_supplementaire_apres_huit,
+            'heure_supplementaire_avant_huit'=> $heure_supplementaire_avant_huit,
+            'heure_supplementaire_apres_huit'=> $heure_supplementaire_apres_huit,
             'heure_supplementaire_jour'=>$heure_supplementaire_jour,
             'heure_de_nuit'=> $heure_de_nuit
         ]);
